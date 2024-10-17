@@ -169,7 +169,7 @@ public class SpringController {
 			e.printStackTrace();
 		}
 // END BOUNCY CASTLE (ADD .fipsEnabled(true) BELOW)
-)
+
 		// Create a Secrets Manager client
 		SecretsManagerClient client = SecretsManagerClient.builder()
 // OPTIONAL: IF RUNNING WITH AWS PROFILE, IF USING INSTANCE CREDENTIALS, LEAVE COMMENTED OUT
