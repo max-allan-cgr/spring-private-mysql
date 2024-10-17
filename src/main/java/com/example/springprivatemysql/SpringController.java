@@ -20,6 +20,16 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
+// ADD BOUNCYCASTLE
+import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
+
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.security.Security;
+import javax.net.ssl.SSLContext;
+// END BOUNCYCASTLE
 
 @RestController
 @EnableWebMvc
@@ -141,10 +151,31 @@ public class SpringController {
 		GetSecretValueResponse getSecretValueResponse;		
 		RDSSecret rdsSecret = null;		
 		Region region = Region.of(regionName);
-		
+
+// ADD BOUNCY CASTLE		
+		Security.addProvider(new BouncyCastleJsseProvider());
+
+		try {
+			SSLContext context = SSLContext.getInstance("TLS","BCJSSE");
+			try {
+				context.init(null, null,new SecureRandom());
+			} catch (KeyManagementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			SSLContext.setDefault(context);
+		} catch (NoSuchAlgorithmException | NoSuchProviderException  e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+// END BOUNCY CASTLE (ADD .fipsEnabled(true) BELOW)
+)
 		// Create a Secrets Manager client
 		SecretsManagerClient client = SecretsManagerClient.builder()
+// OPTIONAL: IF RUNNING WITH AWS PROFILE, IF USING INSTANCE CREDENTIALS, LEAVE COMMENTED OUT
+		// .credentialsProvider(ProfileCredentialsProvider.create("PROFILE-NAME"))		
 		.region(region)
+		.fipsEnabled(true)
 		.build();
 		
 		GetSecretValueRequest getSecretValueRequest = GetSecretValueRequest.builder()
