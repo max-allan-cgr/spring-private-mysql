@@ -16,10 +16,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
+
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 // ADD BOUNCYCASTLE
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 
@@ -29,7 +32,17 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import javax.net.ssl.SSLContext;
+
+import java.security.Security;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.bouncycastle.util.*;
+
 // END BOUNCYCASTLE
+import javax.net.ssl.TrustManagerFactory;
 
 @RestController
 @EnableWebMvc
@@ -153,18 +166,17 @@ public class SpringController {
 		Region region = Region.of(regionName);
 
 // ADD BOUNCY CASTLE		
-		Security.addProvider(new BouncyCastleJsseProvider());
 
+		Security.addProvider(new BouncyCastleFipsProvider());
+		Security.addProvider(new BouncyCastleJsseProvider());
 		try {
-			SSLContext context = SSLContext.getInstance("TLS","BCJSSE");
-			try {
-				context.init(null, null,new SecureRandom());
-			} catch (KeyManagementException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			SSLContext.setDefault(context);
-		} catch (NoSuchAlgorithmException | NoSuchProviderException  e) {
+
+			SSLContext sslContext = SSLContext.getInstance("TLS", "BCJSSE");
+			TrustManagerFactory trustMgrFact = TrustManagerFactory.getInstance("PKIX", "BCJSSE");
+			// trustMgrFact.init(Utils.createServerTrustStore());
+			
+			SSLContext.setDefault(sslContext);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -173,7 +185,7 @@ public class SpringController {
 		// Create a Secrets Manager client
 		SecretsManagerClient client = SecretsManagerClient.builder()
 // OPTIONAL: IF RUNNING WITH AWS PROFILE, IF USING INSTANCE CREDENTIALS, LEAVE COMMENTED OUT
-		// .credentialsProvider(ProfileCredentialsProvider.create("PROFILE-NAME"))		
+		.credentialsProvider(ProfileCredentialsProvider.create("MY-PROFILE"))		
 		.region(region)
 		.fipsEnabled(true)
 		.build();
