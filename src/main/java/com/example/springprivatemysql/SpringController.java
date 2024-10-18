@@ -172,7 +172,7 @@ public class SpringController {
 		try {
 
 			SSLContext sslContext = SSLContext.getInstance("TLS", "BCJSSE");
-			TrustManagerFactory trustMgrFact = TrustManagerFactory.getInstance("PKIX", "BCJSSE");
+			// TrustManagerFactory trustMgrFact = TrustManagerFactory.getInstance("PKIX", "BCJSSE");
 			// trustMgrFact.init(Utils.createServerTrustStore());
 			
 			SSLContext.setDefault(sslContext);
@@ -185,7 +185,7 @@ public class SpringController {
 		// Create a Secrets Manager client
 		SecretsManagerClient client = SecretsManagerClient.builder()
 // OPTIONAL: IF RUNNING WITH AWS PROFILE, IF USING INSTANCE CREDENTIALS, LEAVE COMMENTED OUT
-		.credentialsProvider(ProfileCredentialsProvider.create("MY-PROFILE"))		
+		// .credentialsProvider(ProfileCredentialsProvider.create("MY_PROFILE"))		
 		.region(region)
 		.fipsEnabled(true)
 		.build();
