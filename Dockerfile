@@ -7,4 +7,4 @@ COPY pom.xml /app/
 COPY src /app/src
 RUN mvn clean install
 ENTRYPOINT ["/usr/bin/java"]
-CMD ["-jar", "/app/target/spring-private-mysql-0.0.1-SNAPSHOT.jar"]
+CMD ["--module-path", "/usr/share/java/bouncycastle-fips", "-jar", "/app/target/spring-private-mysql-0.0.1-SNAPSHOT.jar"]

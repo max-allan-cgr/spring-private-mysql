@@ -22,27 +22,8 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
-import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
-// ADD BOUNCYCASTLE
-import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
-
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.Security;
 import javax.net.ssl.SSLContext;
 
-import java.security.Security;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
-import org.bouncycastle.util.*;
-
-// END BOUNCYCASTLE
-import javax.net.ssl.TrustManagerFactory;
 
 @RestController
 @EnableWebMvc
@@ -165,22 +146,13 @@ public class SpringController {
 		RDSSecret rdsSecret = null;		
 		Region region = Region.of(regionName);
 
-// ADD BOUNCY CASTLE		
-
-		Security.addProvider(new BouncyCastleFipsProvider());
-		Security.addProvider(new BouncyCastleJsseProvider());
 		try {
 
 			SSLContext sslContext = SSLContext.getInstance("TLS", "BCJSSE");
-			// TrustManagerFactory trustMgrFact = TrustManagerFactory.getInstance("PKIX", "BCJSSE");
-			// trustMgrFact.init(Utils.createServerTrustStore());
-			
 			SSLContext.setDefault(sslContext);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-// END BOUNCY CASTLE (ADD .fipsEnabled(true) BELOW)
 
 		// Create a Secrets Manager client
 		SecretsManagerClient client = SecretsManagerClient.builder()
